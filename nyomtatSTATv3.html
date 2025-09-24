@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyomtatási Költségek Összehasonlítása</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --color-turkiz: #2a9d8f;
+            --color-darkblue: #264653;
+            --color-light: #f8f9fa;
+            --color-text: #333;
+            --color-border: #dee2e6;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--color-light);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        header {
+            background: linear-gradient(135deg, var(--color-darkblue), var(--color-turkiz));
+            color: white;
+            text-align: center;
+            padding: 4rem 1rem;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .intro {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        .data-visualization {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-container {
+            flex: 1 1 400px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .chart-wrapper {
+            height: 300px;
+            margin-top: 1rem;
+            position: relative;
+        }
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--color-turkiz);
+            background: white;
+            color: var(--color-turkiz);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background: var(--color-turkiz);
+            color: white;
+        }
+        .icons-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .icon-item {
+            text-align: center;
+            flex: 1 1 150px;
+        }
+        .icon-item i {
+            font-size: 2.5rem;
+            color: var(--color-turkiz);
+            margin-bottom: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: white;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        thead {
+            background-color: var(--color-darkblue);
+            color: white;
+        }
+        tbody tr:hover {
+            background-color: rgba(42, 157, 143, 0.05);
+        }
+        .cost-high {
+            color: #e63946;
+            font-weight: bold;
+        }
+        .cost-low {
+            color: var(--color-turkiz);
+            font-weight: bold;
+        }
+        .cta-section {
+            background: linear-gradient(135deg, var(--color-darkblue), var(--color-turkiz));
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-radius: 8px;
+        }
+        .cta-section h2 {
+            margin-bottom: 1.5rem;
+        }
+        .cta-btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--color-turkiz);
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px);
+        }
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .data-visualization {
+                flex-direction: column;
+            }
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>A nyomtatás valódi költségei: Optimalizálja kiadásait <i class="fas fa-coins"></i></h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <p><strong>Sokan csak a nyomtató beszerzési árát veszik figyelembe a vásárláskor, pedig a fenntartási költségek, mint a toner, a festék és az energiafogyasztás, hosszú távon jelentős kiadásokat jelenthetnek.</strong> Ez az oldal célja, hogy átfogó képet adjon a különböző nyomtatótípusok és nyomtatási szokások valós költségeiről, így segítve a tudatos döntéshozatalt.</p>
+        </section>
+
+        <section class="icons-section">
+            <div class="icon-item">
+                <i class="fas fa-fill-drip"></i>
+                <h3>Festék/Toner</h3>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-file-alt"></i>
+                <h3>Papír</h3>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-bolt"></i>
+                <h3>Energia</h3>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-calculator"></i>
+                <h3>Teljes Költség</h3>
+            </div>
+        </section>
+
+        <section class="data-visualization">
+            <div class="chart-container">
+                <h2>Összehasonlítás nyomtatótípusok szerint</h2>
+                <div class="filters">
+                    <button class="filter-btn active" data-type="color">Színes Oldal</button>
+                    <button class="filter-btn" data-type="bw">Fekete-Fehér Oldal</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h2>Költségmegoszlás egy oldalra</h2>
+                <div class="filters">
+                    <select id="printer-select">
+                        <option value="tinta_szines">Színes Tintasugaras - Színes Oldal</option>
+                        <option value="tinta_ff">Színes Tintasugaras - Fekete-Fehér</option>
+                        <option value="lezer_szines">Színes Lézer - Színes Oldal</option>
+                        <option value="lezer_ff">Színes Lézer - Fekete-Fehér</option>
+                        <option value="lezer_ff_mono">Fekete-Fehér Lézer - Fekete-Fehér</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="costDistributionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Összefoglaló Táblázat: A4 oldalak nyomtatási költségei (Ft/oldal) <i class="fas fa-table"></i></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nyomtatótípus</th>
+                        <th>Oldal Típusa</th>
+                        <th>Festék/Toner (Ft)</th>
+                        <th>Papír (Ft)</th>
+                        <th>Energia (Ft)</th>
+                        <th>Teljes Költség (Ft)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Színes tintasugaras</td>
+                        <td>Színes (5% fedés)</td>
+                        <td class="cost-high">35-45</td>
+                        <td>3.5</td>
+                        <td>0.02</td>
+                        <td class="cost-high">38.5-48.5</td>
+                    </tr>
+                    <tr>
+                        <td>Színes tintasugaras</td>
+                        <td>Fekete-fehér (5%)</td>
+                        <td>18-25</td>
+                        <td>3.5</td>
+                        <td>0.02</td>
+                        <td>21.5-28.5</td>
+                    </tr>
+                    <tr>
+                        <td>Színes lézer</td>
+                        <td>Színes (5% fedés)</td>
+                        <td>22-30</td>
+                        <td>3.5</td>
+                        <td>0.10</td>
+                        <td>25.6-33.6</td>
+                    </tr>
+                    <tr>
+                        <td>Színes lézer</td>
+                        <td>Fekete-fehér (5%)</td>
+                        <td>12-14</td>
+                        <td>3.5</td>
+                        <td>0.10</td>
+                        <td>15.6-17.6</td>
+                    </tr>
+                    <tr>
+                        <td>Fekete-fehér lézer</td>
+                        <td>Fekete-fehér (5%)</td>
+                        <td class="cost-low">7-12</td>
+                        <td>3.5</td>
+                        <td>0.08</td>
+                        <td class="cost-low">10.6-15.6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="cta-section">
+            <h2>A következő lépés a nyomtatási költségek optimalizálásához</h2>
+            <p>Egy <strong>fekete-fehér lézernyomtató</strong> a legköltséghatékonyabb a nagy mennyiségű nyomtatáshoz. A <strong>tintasugaras nyomtató</strong> ideális lehet ritkább, vegyes vagy színes nyomtatásokhoz. Az energiaköltség elhanyagolható az oldalankénti költség szempontjából, de irodai környezetben jelentőssé válhat.</p>
+            <p>Kérje ingyenes konzultációját, hogy megtalálja az Ön igényeinek legmegfelelőbb nyomtatási megoldást!</p>
+            <a href="#contact" class="cta-btn">Kérjen árajánlatot most!</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Nyomtatási Költségértékelő. Minden jog fenntartva.</p>
+            <p>Az adatok tájékoztató jellegűek, források: piaci átlagárak és szakmai források (2025).</p>
+        </div>
+    </footer>
+
+    <script>
+        // Adatok a PDF alapján
+        const costData = {
+            color: {
+                labels: ['Színes Tintasugaras', 'Színes Lézer', 'Fekete-Fehér Lézer*'],
+                data: [43.5, 29.6, 13.1], // Átlagos költségek színes oldalakra
+                colors: ['#e63946', '#2a9d8f', '#264653']
+            },
+            bw: {
+                labels: ['Színes Tintasugaras', 'Színes Lézer', 'Fekete-Fehér Lézer'],
+                data: [25, 16.6, 13.1], // Átlagos költségek fekete-fehér oldalakra
+                colors: ['#e63946', '#2a9d8f', '#264653']
+            }
+        };
+
+        const distributionData = {
+            tinta_szines: { label: 'Színes Tintasugaras - Színes', ink: 40, paper: 3.5, energy: 0.02 },
+            tinta_ff: { label: 'Színes Tintasugaras - Fekete-Fehér', ink: 21.5, paper: 3.5, energy: 0.02 },
+            lezer_szines: { label: 'Színes Lézer - Színes', ink: 26, paper: 3.5, energy: 0.10 },
+            lezer_ff: { label: 'Színes Lézer - Fekete-Fehér', ink: 13, paper: 3.5, energy: 0.10 },
+            lezer_ff_mono: { label: 'Fekete-Fehér Lézer - Fekete-Fehér', ink: 9.5, paper: 3.5, energy: 0.08 }
+        };
+
+        // Diagramok inicializálása
+        let comparisonChart, distributionChart;
+
+        function initCharts() {
+            // Összehasonlító diagram
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: costData.color.labels,
+                    datasets: [{
+                        label: 'Teljes költség (Ft/oldal)',
+                        data: costData.color.data,
+                        backgroundColor: costData.color.colors,
+                        borderColor: costData.color.colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Költség (Ft/oldal)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Oldalonkénti költség összehasonlítása'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Költség: ${context.parsed.y} Ft/oldal`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Költségmegoszlás diagram
+            const distributionCtx = document.getElementById('costDistributionChart').getContext('2d');
+            updateDistributionChart('tinta_szines');
+        }
+
+        function updateComparisonChart(type) {
+            const data = costData[type];
+            comparisonChart.data.labels = data.labels;
+            comparisonChart.data.datasets[0].data = data.data;
+            comparisonChart.data.datasets[0].backgroundColor = data.colors;
+            comparisonChart.data.datasets[0].borderColor = data.colors.map(color => color.replace('0.8', '1'));
+            comparisonChart.update();
+        }
+
+        function updateDistributionChart(printerType) {
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+
+            const data = distributionData[printerType];
+            const total = data.ink + data.paper + data.energy;
+            const percentages = {
+                ink: (data.ink / total * 100).toFixed(1),
+                paper: (data.paper / total * 100).toFixed(1),
+                energy: (data.energy / total * 100).toFixed(1)
+            };
+
+            const distributionCtx = document.getElementById('costDistributionChart').getContext('2d');
+            distributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        `Festék/Toner: ${data.ink} Ft (${percentages.ink}%)`,
+                        `Papír: ${data.paper} Ft (${percentages.paper}%)`, 
+                        `Energia: ${data.energy} Ft (${percentages.energy}%)`
+                    ],
+                    datasets: [{
+                        data: [data.ink, data.paper, data.energy],
+                        backgroundColor: ['#e63946', '#2a9d8f', '#f4a261'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: data.label
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = percentages[['ink', 'paper', 'energy'][context.dataIndex]];
+                                    return `${label.split(':')[0]}: ${value} Ft (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Eseménykezelők
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                updateComparisonChart(this.dataset.type);
+            });
+        });
+
+        document.getElementById('printer-select').addEventListener('change', function() {
+            updateDistributionChart(this.value);
+        });
+
+        // Oldal betöltésekor inicializálás
+        document.addEventListener('DOMContentLoaded', initCharts);
+    </script>
+</body>
+</html>
